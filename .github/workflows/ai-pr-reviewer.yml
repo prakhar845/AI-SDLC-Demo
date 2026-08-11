@@ -26,7 +26,7 @@ jobs:
       - name: Run LLM Review Script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Add this to your repo secrets
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Add this to your repo secrets
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO_NAME: ${{ github.repository }}
         run: python llm_reviewer.py
