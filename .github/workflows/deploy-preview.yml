@@ -1,91 +1,29 @@
-name: Deploy PR Preview & UI-UX Audit
+name: Phase 3 - Visual UI Audit
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-  pull-requests: write
+    types: [opened, synchronize]
 
 jobs:
-  build_and_deploy:
+  ui-ux-audit:
     runs-on: ubuntu-latest
-    environment:
-      name: UI-UX-Preview # Triggers the human required reviewer gate in GitHub settings
-      url: ${{ steps.deployment.outputs.page_url }}
-    
-    # We must explicitly define job outputs so the subsequent vision audit job can catch the URL
-    outputs:
-      page_url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      # --- Change or customize these build steps to fit your frontend framework (React, Vue, Vite, HTML) ---
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Install Dependencies
-        run: npm ci
-        
-      - name: Build Project
-        run: npm run build
-      # -----------------------------------------------------------------------------------------------------
-
-      - name: Setup Pages Routing
-        uses: actions/configure-pages@v4
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './build' # Change this if your build engine saves to a different folder (like 'dist' or 'out')
-
-      - name: Deploy to GitHub Pages Preview Channel
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Comment PR with Preview Link
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 **Preview Deployment Ready!**\n\nThe latest branch code has been compiled and deployed to GitHub Pages for visual assessment.\n\n🔗 **[View Live Preview Target](${process.env.URL})**`
-            })
-        env:
-          URL: ${{ steps.deployment.outputs.page_url }}
-
-  ui_ux_audit:
-    needs: build_and_deploy # Ensures the vision check only executes after a successful deploy job
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python Environment
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install System Engine Dependencies & Playwright
+      - name: Install Playwright and Dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install requests playwright
           playwright install --with-deps chromium
 
-      - name: Run Vision UI Audit via Gemini 3.6 Flash
+      - name: Execute UI/UX Auditor
+        run: python scripts/ui_ux_auditor.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          REPO_NAME: ${{ github.repository }}
-          PREVIEW_URL: ${{ needs.build_and_deploy.outputs.page_url }}
-        run: python .github/scripts/ui_ux_auditor.py
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
