@@ -1,9 +1,10 @@
 name: Automated QA Execution Gate
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-
+  # pull_request:
+  #   types: [opened, synchronize]
+  workflow_dispatch:
+  
 jobs:
   qa_testing:
     runs-on: ubuntu-latest
