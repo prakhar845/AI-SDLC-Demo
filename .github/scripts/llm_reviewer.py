@@ -11,7 +11,7 @@ REPO_NAME = os.getenv('REPO_NAME')
 # API Endpoints
 GH_API_URL = f"https://api.github.com/repos/{REPO_NAME}/pulls/{PR_NUMBER}"
 # Direct Google Gemini REST API endpoint
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 headers_gh = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
