@@ -23,7 +23,7 @@ jobs:
           playwright install --with-deps chromium
 
       - name: Execute UI/UX Auditor
-        run: python scripts/ui_ux_auditor.py
+        run: python .github/scripts/ui_ux_auditor.py
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
